@@ -1,14 +1,5 @@
 class Date:
-
-    # format defines what to expect from date and how to read input
-    # all cases:
-    # dd/mm/yyyy
-    # d-m-yy
-    # d m yy
-    # mm dd yyyy
     def __init__(self, date, form):
-        # if len(form) > 10:
-        #     raise invalidFormLength(len(form))
         self.form = form
         characters = {}
         for i in self.form:
@@ -41,13 +32,6 @@ class Date:
                 pass
         if c < minSeperators:
             raise invalidFormat(f'Too few seperators, got {c}. (min: {minSeperators})')
-
-        ymin = 2
-        ymax = 4
-        dmin = 1
-        dmax = 2
-        mmin = 1
-        mmax = 2
 
         minmaxs = {
             "ymin": 2,
@@ -83,12 +67,6 @@ class Date:
         for i in characters:
             if i in acceptedLetters:
                 order.append(i)
-        # print(pos)
-        # for i in range(len(pos)):
-        #     print(pos[0])
-        #     lowest = min(pos, key=pos.get)
-        #     order.append(lowest)
-        #     pos.pop(lowest)
 
         tempdate = date.split(self.seperator)
         self.date = {}
@@ -104,15 +82,3 @@ class Date:
 class invalidFormat(Exception):
     def __init__(self, message):
         super().__init__(message)
-
-# class invalidFormLength(Exception):
-#     def __init__(self, length):
-#         super().__init__(f'{length} characters. (max: 10)')
-
-
-'''
-def __init__(self, salary, message="Salary is not in (5000, 15000) range"):
-    self.salary = salary
-    self.message = message
-    super().__init__(self.message)
-'''

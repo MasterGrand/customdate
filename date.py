@@ -8,7 +8,7 @@ class Date:
             except KeyError:
                 characters[i] = 1
 
-        acceptedSeperators = [' ', '/', '-', '_']
+        acceptedSeperators = [' ', '/', '-', '_', '.']
         acceptedLetters = ['d', 'm', 'y']
         for i in self.form:
             if i not in acceptedSeperators and i not in acceptedLetters:
@@ -63,10 +63,10 @@ class Date:
             let = i
 
         
-        order = [] # gets the order e.g dd/mm/yyyy or mm/dd/yyyy stores as ['m','d','y']
+        self.order = [] # gets the order e.g dd/mm/yyyy or mm/dd/yyyy stores as ['m','d','y']
         for i in characters:
             if i in acceptedLetters:
-                order.append(i)
+                self.order.append(i)
 
         tempdate = date.split(self.seperator)
 
@@ -74,35 +74,56 @@ class Date:
             raise invalidDate("The seperator of the format does not match given in date.")
 
         self.date = {}
-        for num, i in enumerate(order):
-            self.date[i] = tempdate[num]
+        for num, i in enumerate(self.order):
+            self.date[i] = int(tempdate[num])
 
         # days will be lenient but years will be strict.
         for i, d in enumerate(self.date.values()):
-            d = int(d)
-            if order[i] == "m":
+            if self.order[i] == "m":
                 if d > 12 or d < 1:
                     raise invalidDate(f"Month is invalid, got {d}. (1-12)")
-            elif order[i] == 'y':
+            elif self.order[i] == 'y':
                 if d < 1 or d > 9999:
                     raise invalidDate(f"Year is invalid, got {d}. (1-9999)")
-            elif order[i] == 'd':
-                print(self.isLeapYear())
-                                # handles feburary
+            elif self.order[i] == 'd':
                 if d < 1 or d > self.daysInMonth():
                     raise invalidDate(f"Date is invalid, got {d}. (1-{self.daysInMonth()} for that month)")
 
-    def daysInMonth(self, m=None):
+    def daysInMonth(self, m=None, y=None):
         if m==None:
             m = int(self.date['m'])
-        return (28*(m==2)+self.isLeapYear())+(31-((m+(m<8))%2))*(m!=2)
+        l = self.isLeapYear()
+        if y!=None:
+            l = self.isLeapYear(y)
+        return ((28+l)*(m==2))+(31-((m+(m<8))%2))*(m!=2)
 
     def isLeapYear(self, year=None):
         if year == None:
             year = int(self.date['y'])
         return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
+    def __add__(self, x: int):
+        newdate = {}
+        for i in self.order:
+            newdate[i] = self.date[i]
 
+        newdate['d'] += x
+        while newdate['d'] > self.daysInMonth(newdate['m'],newdate['y']):
+            newdate['d'] -= self.daysInMonth(newdate['m'],newdate['y'])
+            newdate['m'] += 1
+            if newdate['m'] > 12:
+                newdate['m'] = 1
+                newdate['y'] += 1
+            
+
+        newdate = self.seperator.join(map(str,list(newdate.values())))
+        return Date(newdate, self.form)
+    
+    def __radd__(self, x: int):
+        return self + x
+
+    def __repr__(self):
+        return self.seperator.join(map(str,list(self.date.values())))
 
 # 1  2  3  4  5  6  7  8  9  10  11  12
 # 31 28 31 30 31 30 31 31 30 31  30  31

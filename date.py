@@ -1,6 +1,6 @@
 class Date:
-    def __init__(self, date, form):
-        self.form = form
+    def __init__(self, date, form="dd/mm/yyyy"):
+        self.form = form.lower()
         characters = {}
         for i in self.form:
             try:
@@ -8,7 +8,7 @@ class Date:
             except KeyError:
                 characters[i] = 1
 
-        acceptedSeperators = [' ', '/', '-']
+        acceptedSeperators = [' ', '/', '-', '_']
         acceptedLetters = ['d', 'm', 'y']
         for i in self.form:
             if i not in acceptedSeperators and i not in acceptedLetters:
@@ -69,10 +69,39 @@ class Date:
                 order.append(i)
 
         tempdate = date.split(self.seperator)
+
+        if len(tempdate) - 1 > maxSeperators or len(tempdate) - 1 < minSeperators:
+            raise invalidDate("The seperator of the format does not match given in date.")
+
         self.date = {}
         for num, i in enumerate(order):
             self.date[i] = tempdate[num]
-        print(self.date)
+
+        # days will be lenient but years will be strict.
+        for i, d in enumerate(self.date.values()):
+            d = int(d)
+            if order[i] == "m":
+                if d > 12 or d < 1:
+                    raise invalidDate(f"Month is invalid, got {d}. (1-12)")
+            elif order[i] == 'y':
+                if d < 1 or d > 9999:
+                    raise invalidDate(f"Year is invalid, got {d}. (1-9999)")
+            elif order[i] == 'd':
+                print(self.isLeapYear())
+                                # handles feburary
+                if d < 1 or d > self.daysInMonth():
+                    raise invalidDate(f"Date is invalid, got {d}. (1-{self.daysInMonth()} for that month)")
+
+    def daysInMonth(self, m=None):
+        if m==None:
+            m = int(self.date['m'])
+        return (28*(m==2)+self.isLeapYear())+(31-((m+(m<8))%2))*(m!=2)
+
+    def isLeapYear(self, year=None):
+        if year == None:
+            year = int(self.date['y'])
+        return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
 
 
 # 1  2  3  4  5  6  7  8  9  10  11  12
@@ -80,5 +109,9 @@ class Date:
 # if leap year then 29
 
 class invalidFormat(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+class invalidDate(Exception):
     def __init__(self, message):
         super().__init__(message)

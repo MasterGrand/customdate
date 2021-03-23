@@ -8,7 +8,7 @@ class Date:
             except KeyError:
                 characters[i] = 1
 
-        acceptedSeperators = [' ', '/', '-', '_', '.']
+        acceptedSeperators = [' ', '/', '-', '_', '.',',']
         acceptedLetters = ['d', 'm', 'y']
         for i in self.form:
             if i not in acceptedSeperators and i not in acceptedLetters:
@@ -143,6 +143,31 @@ class Date:
         newdate = self.seperator.join(map(str,list(newdate.values())))
         return Date(newdate, self.form)
 
+    def __eq__(self, x) -> bool:
+        if not isinstance(x,Date):
+            raise invalidOperator("Trying to compare two values that are not dates.")
+        for i in ['d','m','y']:
+            if self.date[i] != x.date[i]:
+                return False
+        return True
+
+    def __ne__(self,x) -> bool:
+        return self.__eq__(x) == 0
+    
+    def __le__(self,x) -> bool:
+        return self.__lt__(x) or self.__eq__(x)
+
+    def __lt__(self,x) -> bool:
+        for i in ['y', 'm', 'd']:
+            if self.date[i] < x.date[i]:
+                return True
+        return False
+    
+    def __gt__(self,x) -> bool:
+        return self.__le__(x) == 0
+    
+    def __ge__(self,x) -> bool:
+        return self.__lt__(x) == 0
 
     def __repr__(self):
         return self.seperator.join(map(str,list(self.date.values())))

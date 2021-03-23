@@ -103,6 +103,8 @@ class Date:
         return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
     def __add__(self, x: int):
+        if x < 0:
+            return self.__sub__(abs(x))
         newdate = {}
         for i in self.order:
             newdate[i] = self.date[i]
@@ -114,13 +116,33 @@ class Date:
             if newdate['m'] > 12:
                 newdate['m'] = 1
                 newdate['y'] += 1
-            
-
         newdate = self.seperator.join(map(str,list(newdate.values())))
         return Date(newdate, self.form)
     
     def __radd__(self, x: int):
+        if x < 0:
+            self.__rsub__(x)
         return self + x
+
+    def __rsub__(self,x:int):
+        raise invalidOperator(f"How do I remove a date from {x}, try swapping the values")
+
+    def __sub__(self, x:int):
+        if x < 0:
+            return self.__add__(abs(x))
+        newdate = {}
+        for i in self.order:
+            newdate[i] = self.date[i]
+        newdate['d']-=x
+        while newdate['d'] < 1:
+            newdate['m'] -= 1
+            if newdate['m'] < 1:
+                newdate['m'] = 12
+                newdate['y'] -= 1
+            newdate['d'] += self.daysInMonth(newdate['m'],newdate['y'])
+        newdate = self.seperator.join(map(str,list(newdate.values())))
+        return Date(newdate, self.form)
+
 
     def __repr__(self):
         return self.seperator.join(map(str,list(self.date.values())))
@@ -134,5 +156,9 @@ class invalidFormat(Exception):
         super().__init__(message)
 
 class invalidDate(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+class invalidOperator(Exception):
     def __init__(self, message):
         super().__init__(message)

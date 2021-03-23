@@ -73,7 +73,7 @@ class Date:
         if len(tempdate) - 1 > maxSeperators or len(tempdate) - 1 < minSeperators:
             raise invalidDate("The seperator of the format does not match given in date.")
 
-        self.date = {}
+        self.date = {} # sets final date in order and as integers
         for num, i in enumerate(self.order):
             self.date[i] = int(tempdate[num])
 
@@ -92,10 +92,7 @@ class Date:
     def daysInMonth(self, m=None, y=None):
         if m==None:
             m = int(self.date['m'])
-        l = self.isLeapYear()
-        if y!=None:
-            l = self.isLeapYear(y)
-        return ((28+l)*(m==2))+(31-((m+(m<8))%2))*(m!=2)
+        return ((28+self.isLeapYear(y))*(m==2))+(31-((m+(m<8))%2))*(m!=2)
 
     def isLeapYear(self, year=None):
         if year == None:

@@ -157,7 +157,7 @@ class Date:
                 d+=(self+d).daysInMonth()
             if (self+d).date['m'] == x.date['m'] and (self+d).date['y'] == x.date['y']: # go to day in final month
                 d+=(x).date['d'] - (self+d).date['d']
-                return d
+            return d
 
         if x < 0:
             return self.__add__(abs(x))
@@ -190,9 +190,9 @@ class Date:
 
     def __lt__(self,x) -> bool:
         for i in ['y', 'm', 'd']:
-            if self.date[i] < x.date[i]:
-                return True
-        return False
+            if self.date[i] != x.date[i]:
+                return self.date[i] < x.date[i]
+        return False # only called when two are equal
     
     def __gt__(self,x) -> bool:
         return self.__le__(x) == 0

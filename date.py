@@ -142,7 +142,7 @@ class Date:
             if self == x:
                 return 0
             if self > x:
-                return x.__sub__(self)
+                return -x.__sub__(self)
             # x is now always larger than self here.
             # hence, always going forward
             tempdate = Date(str(self), self.form)
@@ -157,7 +157,7 @@ class Date:
                 d+=(self+d).daysInMonth()
             if (self+d).date['m'] == x.date['m'] and (self+d).date['y'] == x.date['y']: # go to day in final month
                 d+=(x).date['d'] - (self+d).date['d']
-            return d
+            return -d
 
         if x < 0:
             return self.__add__(abs(x))

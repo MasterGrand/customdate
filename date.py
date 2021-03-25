@@ -99,6 +99,7 @@ class Date:
             year = int(self.date['y'])
         return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
+    # returns date type
     def __add__(self, x: int):
         if x < 0:
             return self.__sub__(abs(x))
@@ -124,7 +125,40 @@ class Date:
     def __rsub__(self,x:int):
         raise invalidOperator(f"How do I remove a date from {x}, try swapping the values")
 
+    def daysInYear(self, y=None):
+        y = self.isLeapYear()
+        return 365 + self.isLeapYear(y)
+
+    def daysLeftInMonth(self,d=None, m=None):
+        return self.daysInMonth() - self.date['d']
+
+    def __iadd__(self, x):
+        return self.__add__(x)
+
+    # if passed two dates returns int, number of days between two dates
+    # else if passed date and integer will return date with integer days removed from date.
     def __sub__(self, x:int):
+        if isinstance(x,Date):
+            if self == x:
+                return 0
+            if self > x:
+                return x.__sub__(self)
+            # x is now always larger than self here.
+            # hence, always going forward
+            tempdate = Date(str(self), self.form)
+            d = 0
+            if (self+d).date['m'] != x.date['m']: # go to last day of month
+                d += self.daysLeftInMonth() + 1
+            while (self+d).date['m'] != x.date['m'] and self.date['y'] == (self+d).date['y']:
+                d+=(self+d).daysInMonth()
+            while x.date['y'] != (self+d).date['y']:# go to year
+                d+=(self+d).daysInYear()
+            while x.date['m'] != (self+d).date['m']:# go to month
+                d+=(self+d).daysInMonth()
+            if (self+d).date['m'] == x.date['m'] and (self+d).date['y'] == x.date['y']: # go to day in final month
+                d+=(x).date['d'] - (self+d).date['d']
+                return d
+
         if x < 0:
             return self.__add__(abs(x))
         newdate = {}
@@ -168,10 +202,6 @@ class Date:
 
     def __repr__(self):
         return self.seperator.join(map(str,list(self.date.values())))
-
-# 1  2  3  4  5  6  7  8  9  10  11  12
-# 31 28 31 30 31 30 31 31 30 31  30  31
-# if leap year then 29
 
 class invalidFormat(Exception):
     def __init__(self, message):

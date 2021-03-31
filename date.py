@@ -127,7 +127,7 @@ class Date:
 
     def daysInYear(self, y=None):
         y = self.isLeapYear()
-        return 365 + self.isLeapYear(y)
+        return 365 + self.isLeapYear()
 
     def daysLeftInMonth(self,d=None, m=None):
         return self.daysInMonth() - self.date['d']
@@ -141,23 +141,22 @@ class Date:
         if isinstance(x,Date):
             if self == x:
                 return 0
-            if self > x:
+            if self < x:
                 return -x.__sub__(self)
-            # x is now always larger than self here.
+            # x is now always smaller than self here.
             # hence, always going forward
-            tempdate = Date(str(self), self.form)
             d = 0
-            if (self+d).date['m'] != x.date['m']: # go to last day of month
-                d += self.daysLeftInMonth() + 1
-            while (self+d).date['m'] != x.date['m'] and self.date['y'] == (self+d).date['y']:
-                d+=(self+d).daysInMonth()
-            while x.date['y'] != (self+d).date['y']:# go to year
-                d+=(self+d).daysInYear()
-            while x.date['m'] != (self+d).date['m']:# go to month
-                d+=(self+d).daysInMonth()
-            if (self+d).date['m'] == x.date['m'] and (self+d).date['y'] == x.date['y']: # go to day in final month
-                d+=(x).date['d'] - (self+d).date['d']
-            return -d
+            if (x+d).date['m'] != self.date['m'] or x.date['y'] != self.date['y']:
+                d += x.daysLeftInMonth() + 1
+            while (x+d).date['m'] != self.date['m'] and x.date['y'] == (x+d).date['y']:
+                d+=(x+d).daysInMonth()
+            while (x+d).date['y'] != self.date['y']:# go to year
+                d+=(x+d).daysInYear()
+            while self.date['m'] != (x+d).date['m']:# go to month
+                d+=(x+d).daysInMonth()
+            if (x+d).date['m'] == self.date['m'] and (x+d).date['y'] == self.date['y']: # go to day in final month
+                d+=(self).date['d'] - (x+d).date['d']
+            return d
 
         if x < 0:
             return self.__add__(abs(x))

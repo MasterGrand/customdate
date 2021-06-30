@@ -172,6 +172,9 @@ class Date:
             newdate['d'] += self.daysInMonth(newdate['m'],newdate['y'])
         newdate = self.seperator.join(map(str,list(newdate.values())))
         return Date(newdate, self.form)
+    
+    def __format__(self, f: str):
+        return f.replace("%d", str(self.date['d'])).replace("%m", str(self.date['m'])).replace("%y", str(self.date['y']))
 
     def __eq__(self, x) -> bool:
         if not isinstance(x,Date):

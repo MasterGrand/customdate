@@ -174,7 +174,7 @@ class Date:
         return Date(newdate, self.form)
     
     def __format__(self, f: str):
-        return f.replace("%d", str(self.date['d'])).replace("%m", str(self.date['m'])).replace("%y", str(self.date['y']))
+        return f.replace("%dd", str(self.date['d']).zfill(2)).replace("%mm", str(self.date['m']).zfill(2)).replace("%yy", str(self.date['y'])).replace("%d", str(self.date['d'])).replace("%m", str(self.date['m'])).replace("%y", str(self.date['y'])[:-2])
 
     def __eq__(self, x) -> bool:
         if not isinstance(x,Date):
